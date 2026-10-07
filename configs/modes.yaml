@@ -1,0 +1,34 @@
+# Shared reporting-mode parameters (paper eqs 1-11)
+modes:
+  raw:
+    desc: "Conventional periodic payload reporting (baseline)"
+    period_min: 15            # reporting period
+    L_app: 200               # application payload bytes per report
+    H: 60                    # fixed protocol/access/framing overhead bytes
+    ai_energy_mJ: 0.0         # no local inference
+  compressed:
+    desc: "Conventional ~2:1 compression reference"
+    period_min: 15
+    L_app: 100               # ~2:1 vs raw
+    H: 60
+    ai_energy_mJ: 0.5         # small codec cost
+  event_triggered:
+    desc: "Deterministic event-triggering reference (raw payload on trigger)"
+    L_app: 200
+    H: 60
+    ai_energy_mJ: 0.2         # threshold comparator
+  semantic:
+    desc: "Semantic/task-oriented: compact task output + admission control"
+    L_app: 20                # task decision + confidence + provenance bytes
+    H: 60
+    heartbeat_h: 6           # periodic heartbeat interval
+    audit_per_day: 1         # raw audit samples per day (fallback/accountability)
+    ai_energy_mJ: 3.0        # local inference per sensing sample (sensitivity-swept)
+
+# Sanity-check constants for the paper's illustrative example (eq 11)
+illustrative:
+  L_raw: 200
+  L_sem: 20
+  H: 60
+  q: 0.1
+  expected_GB: 32.5

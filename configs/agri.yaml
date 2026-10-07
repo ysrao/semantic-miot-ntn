@@ -1,0 +1,48 @@
+# Smart-agriculture trace configuration (India-oriented lens)
+# 90-day trace, 15-min sensing step, water-balance soil-moisture model.
+trace:
+  days: 90
+  dt_min: 15
+  # Monsoon phases: (start_day, end_day, rain_lambda_per_day, rain_mean_mm_h, temp_C_base, rh_base)
+  phases:
+    - {name: dry_pre,      start: 0,  end: 20, rain_lambda: 0.15, rain_mean: 2.0,  temp: 36.0, rh: 0.35}
+    - {name: onset,        start: 20, end: 35, rain_lambda: 0.8,  rain_mean: 6.0,  temp: 33.0, rh: 0.65}
+    - {name: monsoon,      start: 35, end: 70, rain_lambda: 1.8,  rain_mean: 12.0, temp: 30.0, rh: 0.85}
+    - {name: withdrawal,   start: 70, end: 80, rain_lambda: 0.6,  rain_mean: 5.0,  temp: 32.0, rh: 0.60}
+    - {name: dry_post,     start: 80, end: 90, rain_lambda: 0.15, rain_mean: 2.0,  temp: 34.0, rh: 0.40}
+  temp_diurnal_amp: 5.0        # +/- C around base
+  temp_noise: 0.8
+  rh_noise: 0.03
+  rain_noise: 0.5              # multiplicative lognormal-ish spread
+  # Soil water-balance bucket (volumetric fraction)
+  sm_init: 0.28
+  field_capacity: 0.38
+  wilting_point: 0.12
+  infiltration_frac: 0.75      # fraction of rainfall entering soil
+  drainage_rate: 0.02          # per hour above field capacity
+  et0_mm_day: 8.0              # reference evapotranspiration (hot dry climate)
+  irrig_refill_frac: 0.75      # reference actuation refills SM to this x field capacity
+  sensor_noise_sm: 0.015       # observation noise on soil moisture
+  sensor_noise_temp: 0.5
+  sensor_noise_rh: 0.02
+  # Crop stages: (start_day, end_day, sm_threshold, stage_name)
+  crop_stages:
+    - {name: vegetative, start: 0,  end: 25, sm_threshold: 0.20}
+    - {name: flowering,  start: 25, end: 55, sm_threshold: 0.25}   # most sensitive
+    - {name: grain_fill, start: 55, end: 90, sm_threshold: 0.22}
+  # Ground-truth irrigation-need event: SM below stage threshold for >= this long
+  event_persist_h: 6.0
+  # Stratification labels used in reporting
+  strata: [dry, normal_rainfall, irrigation, heavy_rain, monsoon]
+
+task:
+  name: irrigation_decision
+  deadline_h: 6.0              # decision must arrive within 6 h of event onset
+  miss_target: 0.02            # P_miss target <= 2%
+  # Semantic device policy (tuned on held-out tuning traces)
+  persist_confirm: 2           # consecutive over-threshold samples before emitting decision
+  hysteresis: 0.02             # reset latch only when obs clears thr + hysteresis
+  smooth: 8                    # causal moving-average length (samples; 8 x 15 min = 2 h)
+  conf_margin: 0.02            # confidence from threshold margin
+  # Event-triggered reference: transmit when |dSM/dt| or threshold crossing
+  et_delta_sm: 0.02

@@ -1,0 +1,10 @@
+# Device energy model (eq 5). All values are MODELED (not hardware-measured);
+# chosen as plausible NB-IoT-class numbers and reported as sensitivity ranges.
+energy:
+  E_sense_mJ: 2.0             # per sensing sample (sensor read + ADC)
+  E_access_mJ: 250.0          # per random-access attempt (NPRACH + signaling)
+  P_tx_W: 0.2                 # 23 dBm transmit power
+  P_sleep_uW: 15.0            # deep-sleep power
+  # AI inference energy per sensing sample is per-mode (configs/modes.yaml);
+  # sensitivity sweep range for the break-even analysis:
+  ai_sweep_mJ: [0.1, 0.5, 1.0, 3.0, 10.0, 30.0, 100.0, 300.0, 1000.0]

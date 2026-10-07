@@ -1,0 +1,9 @@
+app,mode,burst,M_supported
+agri,raw,False,50
+agri,raw,True,50
+agri,compressed,False,50
+agri,compressed,True,100
+agri,event_triggered,False,200
+agri,event_triggered,True,200
+agri,semantic,False,1600
+agri,semantic,True,1600

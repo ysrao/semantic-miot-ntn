@@ -1,0 +1,9 @@
+app,mode,burst,M_supported
+env,raw,False,0
+env,raw,True,0
+env,compressed,False,0
+env,compressed,True,0
+env,event_triggered,False,800
+env,event_triggered,True,400
+env,semantic,False,400
+env,semantic,True,400
